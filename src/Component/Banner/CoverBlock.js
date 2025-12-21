@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './CoverBlock.css';
-import teacherPhoto from '../../assec/Вставленное изображение.png';
 import qrCode from '../../assec/qr.jpg';
+import image1 from '../../assec/1.png';
+import image2 from '../../assec/2.png';
+import image3 from '../../assec/3.png';
+import image4 from '../../assec/4.png';
 
 const CoverBlock = () => {
+  const images = [image1, image2, image3, image4];
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 4000); // Меняем изображение каждые 4 секунды
+
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  const goToSlide = (index) => {
+    setCurrentIndex(index);
+  };
+
   return (
     <section className="cover-block">
       <div className="cover-container">
@@ -55,8 +73,34 @@ const CoverBlock = () => {
           </div>
 
           <div className="cover-image-section">
-            <div className="teacher-photo-wrapper">
-              <img src={teacherPhoto} alt="Татьяна Валентиновна Эксакусто" className="teacher-photo" />
+            <div className="carousel-wrapper">
+              <div className="carousel-container">
+                {images.map((image, index) => (
+                  <div
+                    key={index}
+                    className={`carousel-slide ${index === currentIndex ? 'active' : ''}`}
+                    style={{
+                      transform: `translateX(${(index - currentIndex) * 100}%)`,
+                    }}
+                  >
+                    <img 
+                      src={image} 
+                      alt={`МАК карты ${index + 1}`} 
+                      className="carousel-image" 
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="carousel-dots">
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`carousel-dot ${index === currentIndex ? 'active' : ''}`}
+                    onClick={() => goToSlide(index)}
+                    aria-label={`Перейти к слайду ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
