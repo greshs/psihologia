@@ -1,4 +1,4 @@
-import { WORDPRESS_CONFIG } from '../config/wordpress';
+import { API_CONFIG } from '../config/apiConfig';
 
 // Локальные данные по умолчанию (fallback)
 const defaultContent = {
@@ -57,13 +57,16 @@ const defaultContent = {
  */
 export const fetchContent = async () => {
   try {
-    // URL бэкенда (можно задать через переменную окружения)
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+    // Используем конфигурацию API
+    const API_URL = API_CONFIG.API_URL;
     
-    const response = await fetch(`${API_URL}/content`, {
+    // Добавляем timestamp для предотвращения кэширования
+    const timestamp = new Date().getTime();
+    const response = await fetch(`${API_URL}/content?t=${timestamp}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
       },
     });
 
@@ -76,39 +79,7 @@ export const fetchContent = async () => {
   } catch (error) {
     console.warn('Ошибка загрузки из API, используем локальные данные:', error);
     
-    if (WORDPRESS_CONFIG.USE_FALLBACK) {
-      return defaultContent;
-    }
-    throw error;
-  }
-};
-
-/**
- * Альтернативный метод: получение через ACF (Advanced Custom Fields)
- */
-export const fetchContentACF = async () => {
-  try {
-    const response = await fetch(
-      `${WORDPRESS_CONFIG.API_URL}/pages/${WORDPRESS_CONFIG.PAGE_ID}?_embed`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (response.ok) {
-      const page = await response.json();
-      // ACF поля обычно доступны через acf объект
-      return page.acf || defaultContent;
-    } else {
-      throw new Error('WordPress API недоступен');
-    }
-  } catch (error) {
-    console.warn('Ошибка загрузки из WordPress, используем локальные данные:', error);
-    
-    if (WORDPRESS_CONFIG.USE_FALLBACK) {
+    if (API_CONFIG.USE_FALLBACK) {
       return defaultContent;
     }
     throw error;

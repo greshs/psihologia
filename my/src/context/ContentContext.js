@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { fetchContent } from '../services/wordpressAPI';
+import { fetchContent } from '../services/contentAPI';
 
 const ContentContext = createContext();
 
@@ -17,21 +17,36 @@ export const ContentProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const loadContent = async () => {
+    const loadContent = async (showLoading = false) => {
       try {
-        setLoading(true);
+        if (showLoading) {
+          setLoading(true);
+        }
         const data = await fetchContent();
         setContent(data);
         setError(null);
       } catch (err) {
-        setError(err.message);
+        // При автоматическом обновлении не показываем ошибку в UI
+        if (showLoading) {
+          setError(err.message);
+        }
         console.error('Ошибка загрузки контента:', err);
       } finally {
-        setLoading(false);
+        if (showLoading) {
+          setLoading(false);
+        }
       }
     };
 
-    loadContent();
+    // Загружаем данные сразу с индикатором загрузки
+    loadContent(true);
+
+    // Обновляем данные каждые 30 секунд в фоне (без индикатора загрузки)
+    const interval = setInterval(() => {
+      loadContent(false);
+    }, 30000); // 30 секунд
+
+    return () => clearInterval(interval);
   }, []);
 
   const value = {

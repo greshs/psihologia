@@ -12,7 +12,7 @@ const CoverBlock = () => {
   const images = [image1, image2, image3, image4];
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // Используем данные из WordPress или fallback
+  // Используем данные из API или fallback
   const coverData = content?.cover || {};
 
   useEffect(() => {

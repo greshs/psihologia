@@ -7,7 +7,7 @@ import teacherPhoto from '../../assec/Вставленное изображен�
 const DetailsBlock = () => {
   const { content, loading } = useContent();
   
-  // Используем данные из WordPress или fallback
+  // Используем данные из API или fallback
   const programData = content?.program || {};
   const resultsData = content?.results || {};
   const bannerData = content?.banner || {};
