@@ -34,6 +34,10 @@ Thumbs.db
 # Backend data (не коммитим данные, они создадутся при первом запуске)
 backend/data/
 
+# Uploaded images
+backend/uploads/*
+!backend/uploads/.gitkeep
+
 # React Create App defaults
 /.pnp
 .pnp.js
