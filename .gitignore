@@ -33,3 +33,8 @@ Thumbs.db
 
 # Backend data (не коммитим данные, они создадутся при первом запуске)
 backend/data/
+
+# React Create App defaults
+/.pnp
+.pnp.js
+/coverage
