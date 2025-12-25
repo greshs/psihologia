@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import './DetailsBlock.css';
 import { useContent } from '../../context/ContentContext';
+import { getImageUrl } from '../../config/apiConfig';
 import qrCode from '../../assec/qr.jpg';
 import teacherPhoto from '../../assec/Вставленное изображение.png';
 
@@ -13,6 +14,22 @@ const DetailsBlock = () => {
   const bannerData = content?.banner || {};
   const directorData = content?.director || {};
   const contactData = content?.contact || {};
+  
+  // Фото директора: сначала из API, потом fallback
+  const directorPhotoUrl = useMemo(() => {
+    if (directorData.photo) {
+      return getImageUrl(directorData.photo);
+    }
+    return teacherPhoto;
+  }, [directorData.photo]);
+  
+  // QR код для блока 2: сначала из API, потом fallback
+  const contactQrUrl = useMemo(() => {
+    if (contactData.qrCode) {
+      return getImageUrl(contactData.qrCode);
+    }
+    return qrCode;
+  }, [contactData.qrCode]);
 
   if (loading) {
     return (
@@ -57,7 +74,7 @@ const DetailsBlock = () => {
           <div className="info-sections">
             <div className="director-section">
               <div className="director-photo-wrapper">
-                <img src={teacherPhoto} alt={directorData.name || "Татьяна Валентиновна Эксакусто"} />
+                <img src={directorPhotoUrl} alt={directorData.name || "Татьяна Валентиновна Эксакусто"} />
               </div>
               <div className="director-info">
                 <div className="director-label">{directorData.label || "Руководитель программы"}</div>
@@ -106,7 +123,7 @@ const DetailsBlock = () => {
                 </div>
               </div>
               <div className="contact-qr-wrapper">
-                <img src={qrCode} alt="QR код для записи" className="qr-code-large" />
+                <img src={contactQrUrl} alt="QR код для записи" className="qr-code-large" />
               </div>
             </div>
           </div>

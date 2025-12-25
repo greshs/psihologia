@@ -41,10 +41,10 @@ export const ContentProvider = ({ children }) => {
     // Загружаем данные сразу с индикатором загрузки
     loadContent(true);
 
-    // Обновляем данные каждые 30 секунд в фоне (без индикатора загрузки)
+    // Обновляем данные каждые 5 секунд в фоне (без индикатора загрузки)
     const interval = setInterval(() => {
       loadContent(false);
-    }, 30000); // 30 секунд
+    }, 5000); // 5 секунд
 
     return () => clearInterval(interval);
   }, []);

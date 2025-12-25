@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './CoverBlock.css';
 import { useContent } from '../../context/ContentContext';
+import { getImageUrl } from '../../config/apiConfig';
 import qrCode from '../../assec/qr.jpg';
 import image1 from '../../assec/1.png';
 import image2 from '../../assec/2.png';
@@ -9,19 +10,36 @@ import image4 from '../../assec/4.png';
 
 const CoverBlock = () => {
   const { content, loading } = useContent();
-  const images = [image1, image2, image3, image4];
-  const [currentIndex, setCurrentIndex] = useState(0);
   
   // Используем данные из API или fallback
   const coverData = content?.cover || {};
+  
+  // Изображения карусели: сначала из API, потом fallback
+  const carouselImages = useMemo(() => {
+    if (coverData.carouselImages && coverData.carouselImages.length > 0) {
+      return coverData.carouselImages.map(img => getImageUrl(img)).filter(Boolean);
+    }
+    return [image1, image2, image3, image4];
+  }, [coverData.carouselImages]);
+  
+  // QR код: сначала из API, потом fallback
+  const qrCodeUrl = useMemo(() => {
+    if (coverData.qrCode) {
+      return getImageUrl(coverData.qrCode);
+    }
+    return qrCode;
+  }, [coverData.qrCode]);
+  
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
+    if (carouselImages.length === 0) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % carouselImages.length);
     }, 4000); // Меняем изображение каждые 4 секунды
 
     return () => clearInterval(interval);
-  }, [images.length]);
+  }, [carouselImages.length]);
 
   const goToSlide = (index) => {
     setCurrentIndex(index);
@@ -91,7 +109,7 @@ const CoverBlock = () => {
                 <span>{coverData.registerButton || "Записаться на курс"}</span>
               </a>
               <div className="qr-section">
-                <img src={qrCode} alt="QR код для записи" className="qr-code" />
+                <img src={qrCodeUrl} alt="QR код для записи" className="qr-code" />
               </div>
             </div>
           </div>
@@ -99,7 +117,7 @@ const CoverBlock = () => {
           <div className="cover-image-section">
             <div className="carousel-wrapper">
               <div className="carousel-container">
-                {images.map((image, index) => (
+                {carouselImages.map((image, index) => (
                   <div
                     key={index}
                     className={`carousel-slide ${index === currentIndex ? 'active' : ''}`}
@@ -116,7 +134,7 @@ const CoverBlock = () => {
                 ))}
               </div>
               <div className="carousel-dots">
-                {images.map((_, index) => (
+                {carouselImages.map((_, index) => (
                   <button
                     key={index}
                     className={`carousel-dot ${index === currentIndex ? 'active' : ''}`}
